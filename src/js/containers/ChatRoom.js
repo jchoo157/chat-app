@@ -15,13 +15,15 @@ export default class ChatRoom extends Component {
       selectedUser: '',
       users: [],
       created: false,
-      activeChats: []
+      activeChats: [],
+      newMessagesFromUsers: {}
     }
 
     this.updateCurrentUser = this.updateCurrentUser.bind(this);
     this.createUser = this.createUser.bind(this);
     this.joinUserChat = this.joinUserChat.bind(this);
     this.activeChats = this.activeChats.bind(this);
+    this.setNewMessagesFromUsers = this.setNewMessagesFromUsers.bind(this);
   }
 
   componentDidMount() {
@@ -31,6 +33,11 @@ export default class ChatRoom extends Component {
       let copyUsers = [...data.usersArray];
       that.setState({users: copyUsers})
     })
+  }
+
+  setNewMessagesFromUsers(newMessages) {
+    this.setState({newMessagesFromUsers: newMessages})
+    console.log('setNewMessages', newMessages);
   }
 
   activeChats(selectedUser) {
@@ -63,13 +70,13 @@ export default class ChatRoom extends Component {
   }
 
   render() {
-    const {users, currentUser, selectedUser, created, isAgent, activeChats} = this.state;
+    const {users, currentUser, selectedUser, created, isAgent, activeChats, newMessagesFromUsers} = this.state;
 
     return(
       <div id="chatroom">
         {!created ? <CreateUser currentUser={currentUser} createUser={this.createUser} updateCurrentUser={this.updateCurrentUser}/> : null}
-        {created ? <Users users={users} joinUserChat={this.joinUserChat} isAgent={isAgent}/> : null}
-        {created ? <ChatBox socket={socket} currentUser={currentUser} selectedUser={selectedUser} isAgent={isAgent} users={users} activeChats={activeChats} /> : null}
+        {created ? <Users users={users} joinUserChat={this.joinUserChat} isAgent={isAgent} newMessagesFromUsers={newMessagesFromUsers} /> : null}
+        {created ? <ChatBox socket={socket} currentUser={currentUser} selectedUser={selectedUser} isAgent={isAgent} users={users} activeChats={activeChats} setNewMessagesFromUsers={this.setNewMessagesFromUsers}/> : null}
       </div>
     )
   }

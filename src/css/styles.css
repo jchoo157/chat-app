@@ -63,8 +63,21 @@ html, body {
       margin: 5px;
       padding: 2px 5px;
       cursor: pointer;
+      position: relative;
+
+      .new-msg-dot {
+        min-height:10px;
+        min-width: 10px;
+        background: red;
+        border-radius: 50%;
+        right: 5px;
+        top: 5px;
+        position: absolute;
+        border-radius: 50%;
+      }
 
       &.agent {
+        border: 1px solid yellow;
         background: yellow;
       }
     }

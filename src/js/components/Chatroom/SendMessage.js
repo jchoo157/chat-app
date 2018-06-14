@@ -22,7 +22,7 @@ export default class SendMessage extends Component {
     const {sendMessage, selectedUser} = this.props;
 
     return(
-      <form action="" onSubmit={(e) => {sendMessage(e, inputValue, selectedUser); eraseInputValue()}}>
+      <form action="" onSubmit={(e) => {sendMessage(e, inputValue, selectedUser); this.eraseInputValue()}}>
         <input row="2" col="30" autocomplete="off" value={this.state.inputValue} onChange={(e) => {this.updateInputValue(e)}}/>
         <button type="submit">Send</button>
       </form>

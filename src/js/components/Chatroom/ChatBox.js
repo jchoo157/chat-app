@@ -7,6 +7,7 @@ export default class ChatBox extends Component {
 
     this.state = {
       messages: {},
+      newMessagesFromUsers: {}
     }
 
     this.listenForNewMessages = this.listenForNewMessages.bind(this);
@@ -36,11 +37,11 @@ export default class ChatBox extends Component {
   }
 
   listenForNewMessages() {
-    const {socket} = this.props;
+    const {socket, setNewMessagesFromUsers} = this.props;
     let that = this;
 
     socket.on('new message', function(data) {
-      const {messages} = that.state;
+      const {messages, newMessagesFromUsers} = that.state;
       let copyOfMessages = Object.assign({}, messages);
       console.log('new message display copymessages', copyOfMessages)
       if (!copyOfMessages[data.from]) {
@@ -48,7 +49,12 @@ export default class ChatBox extends Component {
       } else {
         copyOfMessages[data.from].push({selectedUser: data.selectedUser, from: data.from, input: data.input});
       }
-      that.setState({messages: copyOfMessages, newMessage: true})
+
+      let copyNewMessagesFromUsers = Object.assign({}, newMessagesFromUsers);
+      copyNewMessagesFromUsers[data.from] = true;
+
+      setNewMessagesFromUsers(copyNewMessagesFromUsers);
+      that.setState({messages: copyOfMessages, newMessagesFromUsers: copyNewMessagesFromUsers})
     })
   }
 
