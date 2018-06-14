@@ -19,11 +19,6 @@ io.on('connection', function(socket) {
   connections.push(socket);
   console.log('A user connected', connections.length);
 
-  // socket.on('join', function (data) {
-  //   socket.join(data.selectedUser);
-  //   console.log('joined', data.selectedUser)
-  // });
-
   // Disconnect
   socket.on('disconnect', function(data) {
     if(!socket.currentUser) return;
@@ -32,11 +27,15 @@ io.on('connection', function(socket) {
   }); 
 
   // Send message
-
   socket.on('send message', function(data) {
     console.log(data);
 
     users[data.selectedUser].emit('new message', {selectedUser: data.selectedUser, from: data.from, input: data.input});
+  })
+
+  socket.on('typing', function(data) {
+    console.log('typing!')
+    users[data.selectedUser].emit('is typing', {from: data.currentUser});
   })
 
   socket.on('create user', function(data, callback) {

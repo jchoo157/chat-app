@@ -17,7 +17,9 @@ export default class CreateUser extends Component {
   }
 
   render() {
+    const {isAgent} = this.state;
     const {currentUser, createUser, updateCurrentUser} = this.props;
+    console.log('render create user', isAgent);
     
     return (
       <div id="create_user">
@@ -33,7 +35,7 @@ export default class CreateUser extends Component {
             <input id="check_box" type="checkbox" onClick={(e) => {this.checkboxClicked(e)}} />
           </div>
           <br/>
-          <button type="submit">Send</button>
+          <button type="submit">Create</button>
         </form>
       </div>  
     )

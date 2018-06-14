@@ -7,16 +7,33 @@ export default class ChatBox extends Component {
 
     this.state = {
       messages: {},
-      newMessagesFromUsers: {}
+      activeChats: [],
+      isTyping: false,
+      highlightUser: this.props.selectedUser,
+      newMessagesFromUsers: this.props.newMessagesFromUsers
     }
 
     this.listenForNewMessages = this.listenForNewMessages.bind(this);
     this.clickChatBar = this.clickChatBar.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
+    this.isTyping = this.isTyping.bind(this);
+    this.highlightUserChat = this.highlightUserChat.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props != nextProps) {
+      this.setState({
+        activeChats: nextProps.activeChats, 
+        isTyping: nextProps.isTyping,
+        highlightUser: nextProps.selectedUser,
+        newMessagesFromUsers: nextProps.newMessagesFromUsers
+      })
+    }
   }
 
   componentDidMount() {
     this.listenForNewMessages()
+    this.isTyping()
   }
 
   clickChatBar(user) {
@@ -37,11 +54,11 @@ export default class ChatBox extends Component {
   }
 
   listenForNewMessages() {
-    const {socket, setNewMessagesFromUsers} = this.props;
+    const {socket, setNewMessagesFromUsers, openNewMessageFromUsers, joinUserChat} = this.props;
     let that = this;
 
     socket.on('new message', function(data) {
-      const {messages, newMessagesFromUsers} = that.state;
+      const {messages} = that.state;
       let copyOfMessages = Object.assign({}, messages);
       console.log('new message display copymessages', copyOfMessages)
       if (!copyOfMessages[data.from]) {
@@ -50,11 +67,18 @@ export default class ChatBox extends Component {
         copyOfMessages[data.from].push({selectedUser: data.selectedUser, from: data.from, input: data.input});
       }
 
-      let copyNewMessagesFromUsers = Object.assign({}, newMessagesFromUsers);
+      let copyNewMessagesFromUsers = Object.assign({}, that.state.newMessagesFromUsers);
       copyNewMessagesFromUsers[data.from] = true;
 
       setNewMessagesFromUsers(copyNewMessagesFromUsers);
-      that.setState({messages: copyOfMessages, newMessagesFromUsers: copyNewMessagesFromUsers})
+      console.log('before activeChats length', copyNewMessagesFromUsers)
+
+      if (that.state.activeChats.length < 3) {
+        console.log('activeChats lenght < 3', that.state.activeChats)
+        joinUserChat(data.from);
+      }
+
+      that.setState({messages: copyOfMessages})
     })
   }
 
@@ -73,15 +97,26 @@ export default class ChatBox extends Component {
     socket.emit('send message', {from: currentUser, selectedUser: selectedUser, input: inputValue})
   }
 
-  updateInputValue(e) {
-    this.setState({inputValue: e.target.value})
+  highlightUserChat(selectedUser) {
+    this.setState({highlightUser: selectedUser})
+  }
+
+  isTyping() {
+    const {socket} = this.props;
+    const that = this;
+    socket.on('is typing', function(data) {
+      console.log('we in it! they typing dawg!')
+      that.setState({isTyping: true})
+      // setTimeout(
+      //   that.setState({isTyping: false}),
+      //   5000
+      // )
+    })
   }
 
   displayMessages(user) {
     const {messages} = this.state;
     const {selectedUser, currentUser} = this.props;
-
-    console.log('selected user is ', user.selectedUser);
 
     if (!messages[user.selectedUser]) {
       return
@@ -98,7 +133,8 @@ export default class ChatBox extends Component {
   }
 
   displayChats() {
-    const {activeChats} = this.props;
+    const {isTyping, highlightUser} = this.state;
+    const {activeChats, newMessagesFromUsers, currentUser, socket, selectedUser} = this.props;
 
     console.log('activeChats', activeChats)
 
@@ -107,12 +143,16 @@ export default class ChatBox extends Component {
     }
 
     return activeChats.map((user) => {
+      let minimize = (!user.isActive ? 'minimize' : '')
       return (
-        <div className="chat-box">
+        <div className={"chat-box " + ((highlightUser != user.selectedUser) ? 'dim-box' : '')}>
           <div className="chat-header" onClick={() => {this.clickChatBar(user)}}>Speaking with {user.selectedUser}</div>
-          <div className={"chat-body " + (!user.isActive ? 'minimize' : '')}>
+          <div className={"chat-body " + minimize}>
             {this.displayMessages(user)}
-            <SendMessage sendMessage={this.sendMessage} selectedUser={user.selectedUser}/>
+            {isTyping ? <h6>{user.selectedUser} is typing</h6> : null}
+          </div>
+          <div className={minimize}>
+            <SendMessage socket={socket} sendMessage={this.sendMessage} selectedUser={user.selectedUser} currentUser={currentUser} highlightUserChat={this.highlightUserChat}/>
           </div>
         </div>
       )

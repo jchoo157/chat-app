@@ -41,28 +41,39 @@ export default class ChatRoom extends Component {
   }
 
   activeChats(selectedUser) {
-    const {activeChats} = this.state;
+    const {activeChats, newMessagesFromUsers, currentUser} = this.state;
     let copyActiveChats = [...activeChats];
 
-    if (copyActiveChats.length >= 3) {
+    let userObj = {from: currentUser, selectedUser: selectedUser, isActive: true};
+
+    if (copyActiveChats.length >= 3 || copyActiveChats.some(e => e.selectedUser == selectedUser)) {
       copyActiveChats.pop()
-      copyActiveChats.unshift({selectedUser: selectedUser, isActive: true})
+      copyActiveChats.unshift(userObj)
     } else {
-      copyActiveChats.push({selectedUser: selectedUser, isActive: true})
+      copyActiveChats.push(userObj)
     }
 
-    this.setState({selectedUser: selectedUser, activeChats: copyActiveChats})
+    let copyNewMessagesFromUsers = Object.assign({}, newMessagesFromUsers);
+    console.log('active chats', copyNewMessagesFromUsers)
+    Object.keys(copyNewMessagesFromUsers).map((key) => {
+      if (key == selectedUser && copyNewMessagesFromUsers[key]) {
+        copyNewMessagesFromUsers[key] = false;
+      }
+    })
+
+    this.setState({selectedUser: selectedUser, activeChats: copyActiveChats, newMessagesFromUsers: copyNewMessagesFromUsers})
   }
 
-  joinUserChat(e) {
-    this.activeChats(e.target.innerText)
-    console.log(e.target.innerText)
+  joinUserChat(selectedUser) {
+    this.activeChats(selectedUser)
+    console.log(selectedUser)
   }
 
   createUser(e, isAgent) {
     e.preventDefault();
     socket.emit('create user', {currentUser: this.state.currentUser, isAgent: isAgent});
     this.setState({created: true, isAgent: isAgent})
+    console.log('create user', isAgent)
   }
 
   updateCurrentUser(e) {
@@ -70,13 +81,15 @@ export default class ChatRoom extends Component {
   }
 
   render() {
-    const {users, currentUser, selectedUser, created, isAgent, activeChats, newMessagesFromUsers} = this.state;
+    const { users, currentUser, selectedUser, created, isAgent, 
+            activeChats, newMessagesFromUsers} = this.state;
 
     return(
       <div id="chatroom">
+        <div className="your-username">Your username: <span>{currentUser}</span></div>
         {!created ? <CreateUser currentUser={currentUser} createUser={this.createUser} updateCurrentUser={this.updateCurrentUser}/> : null}
-        {created ? <Users users={users} joinUserChat={this.joinUserChat} isAgent={isAgent} newMessagesFromUsers={newMessagesFromUsers} /> : null}
-        {created ? <ChatBox socket={socket} currentUser={currentUser} selectedUser={selectedUser} isAgent={isAgent} users={users} activeChats={activeChats} setNewMessagesFromUsers={this.setNewMessagesFromUsers}/> : null}
+        {created ? <Users currentUser={currentUser} users={users} joinUserChat={this.joinUserChat} isAgent={isAgent} newMessagesFromUsers={newMessagesFromUsers} /> : null}
+        {created ? <ChatBox socket={socket} currentUser={currentUser} selectedUser={selectedUser} isAgent={isAgent} users={users} activeChats={activeChats} setNewMessagesFromUsers={this.setNewMessagesFromUsers} newMessagesFromUsers={newMessagesFromUsers} openNewMessageFromUsers={this.openNewMessageFromUsers} joinUserChat={this.joinUserChat}/> : null}
       </div>
     )
   }
