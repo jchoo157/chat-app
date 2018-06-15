@@ -21,8 +21,14 @@ io.on('connection', function(socket) {
 
   // Disconnect
   socket.on('disconnect', function(data) {
-    if(!socket.currentUser) return;
-    delete users[socket.currentUser];
+    delete users[data.currentUser];
+    for(var i = 0; i < usersArray.length; i++) {
+      if (usersArray[i].name == data.currentUser) {
+        usersArray.splice(i, 1)
+      }
+    }
+    
+    socket.emit('removed user', {usersArray: usersArray})
     console.log('Disconnected: %s sockets connected', connections.length)
   }); 
 

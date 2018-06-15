@@ -16,7 +16,8 @@ export default class ChatRoom extends Component {
       users: [],
       created: false,
       activeChats: [],
-      newMessagesFromUsers: {}
+      newMessagesFromUsers: {},
+      isAgent: false
     }
 
     this.updateCurrentUser = this.updateCurrentUser.bind(this);
@@ -24,6 +25,7 @@ export default class ChatRoom extends Component {
     this.joinUserChat = this.joinUserChat.bind(this);
     this.activeChats = this.activeChats.bind(this);
     this.setNewMessagesFromUsers = this.setNewMessagesFromUsers.bind(this);
+    this.clearEverything = this.clearEverything.bind(this);
   }
 
   componentDidMount() {
@@ -33,6 +35,39 @@ export default class ChatRoom extends Component {
       let copyUsers = [...data.usersArray];
       that.setState({users: copyUsers})
     })
+
+    socket.on("removed user", function(data) {
+
+      socket.disconnect()
+    })
+  }
+
+  componentWillUnmount() {
+    this.setState({users: that.updateUsers()})
+    socket.emit("disconnect", {currentUser: this.state.currentUser})
+  }
+
+  clearEverything() {
+    this.setState({
+      currentUser: '',
+      selectedUser: '',
+      users: [],
+      created: false,
+      activeChats: [],
+      newMessagesFromUsers: {}
+    })
+  }
+
+  updateUsers() {
+    let copyUsers = [...this.state.users]
+
+    copyUsers.map((user, index) => {
+      if (this.state.currentUser == user.name) {
+        users.splice(index, 1)
+      }
+    })
+
+    return copyUsers
   }
 
   setNewMessagesFromUsers(newMessages) {
@@ -69,9 +104,9 @@ export default class ChatRoom extends Component {
     console.log(selectedUser)
   }
 
-  createUser(e, isAgent) {
+  createUser(e, isAgent, createNewUser=true) {
     e.preventDefault();
-    socket.emit('create user', {currentUser: this.state.currentUser, isAgent: isAgent});
+    createNewUser ? socket.emit('create user', {currentUser: this.state.currentUser, isAgent: isAgent}) : null;
     this.setState({created: true, isAgent: isAgent})
     console.log('create user', isAgent)
   }
@@ -86,6 +121,11 @@ export default class ChatRoom extends Component {
 
     return(
       <div id="chatroom">
+        {/*<div className="cheat-buttons">
+          <div className="clear-everything" onClick={() => {this.clearEverything()}}>RESET APPLICATION</div>
+          { currentUser && !isAgent ? <div className="become-agent" onClick={(e) => {this.createUser(e, true, false)}}>BECOME AGENT</div> : null }
+          { currentUser && isAgent ? <div className="become-user" onClick={(e) => {this.createUser(e, false, false)}}>BECOME USER</div> : null }
+        </div>*/}
         <div className="your-username">Your username: <span>{currentUser}</span></div>
         {!created ? <CreateUser currentUser={currentUser} createUser={this.createUser} updateCurrentUser={this.updateCurrentUser}/> : null}
         {created ? <Users currentUser={currentUser} users={users} joinUserChat={this.joinUserChat} isAgent={isAgent} newMessagesFromUsers={newMessagesFromUsers} /> : null}
