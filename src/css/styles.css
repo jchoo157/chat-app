@@ -1,0 +1,240 @@
+html, body {
+  font-family: arial;
+  color: #4d4d4d;
+}
+
+#chatroom {
+  text-align: center;
+
+  .your-username {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: blue;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+
+    span {
+      color: #ffff00;
+    }
+  }
+
+  .cheat-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.8em;
+
+    .clear-everything {
+      background: red;
+      color: white;
+      padding: 5px 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .become-agent {
+      background: #f7cc31;
+      color: white;
+      padding: 5px 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .become-user {
+      background: lightblue;
+      color: white;
+      padding: 5px 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    > div {
+      margin-bottom: 5px;
+    }
+  }
+
+
+  #create_user, #users {
+    padding: 20px;
+  }
+
+  #create_user {
+    form {
+      label {
+        margin-right: 5px;
+      }
+
+      #username {
+        margin-bottom: 10px;
+        height: 30px;
+        width: 150px;
+        font-size: 0.9em;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 5px;
+        border: 1px solid #c9c9c9;
+      }
+
+      .check-box-agent {
+        background: #e5e5e5;
+        border-radius: 10px;
+        padding: 10px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 5px 10px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        background: #ffc700;
+        color: #424242;
+        font-weight: bold;
+        width: 160px;
+      }
+    }
+  }
+
+  #users {
+
+    ul {
+      padding-left: 0px;
+      list-style: none;
+    }
+
+    .user {
+      background: #a5bdff;
+      border-radius: 10px;
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
+      margin: 5px;
+      padding: 5px;
+      cursor: pointer;
+      position: relative;
+
+      .new-msg-dot {
+        background: red;
+        border-radius: 30px;
+        right: -10px;
+        top: 1px;
+        font-size: 0.5em;
+        position: absolute;
+        color: white;
+        padding: 5px;
+      }
+
+      &:hover {
+        background: #fffdcc;
+        transition: all 0.5s;
+      }
+
+      &.agent {
+        border: 1px solid yellow;
+        background: yellow;
+
+        &:hover {
+          background: #fffdcc;
+          transition: all 0.5s;
+        }
+      }
+    }
+  }
+
+  .chat-boxes {
+    display: inline-block;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+
+  .chat-box {
+    border: 1px solid #bcbcbc;
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-right: 5px;
+    position: relative;
+
+    .chat-header {
+      background: blue;
+      padding: 5px;
+      color: white;
+      cursor: pointer;
+
+      &.hover {
+        background: #7d56ff;
+      }
+    }
+
+    .chat-body {
+      height: 300px;
+      width: 250px;
+      overflow: auto;
+      position: relative;
+
+      > h6{
+        position: absolute;
+        bottom: 0;
+        left: 10px;
+      }
+    }
+
+    &.dim-box {
+      opacity: 0.3;
+      transition: opacity 3s;
+    }
+
+    .minimize {
+      display: none;
+    }
+
+    form {
+      display: flex;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+
+      input {
+        flex: 6;
+      }
+
+      button {
+        flex: 1;
+      }
+    }
+
+    .chat-bubble {
+      padding: 10px 20px;
+      text-align: left;
+      margin: 10px;
+      border-radius: 10px;
+
+      h6 {
+        margin: 0 0 10px 0;
+        font-size: 0.6em;
+      }
+
+      p {
+        font-size: 0.9em;
+        margin: 0;
+      }
+    }
+
+    .self {
+      background: lightblue;
+      float: right;
+      clear: both;
+    }
+
+    .other {
+      background: #d3d3d3;
+      float: left;
+      clear: both;
+    }
+  }
+}
